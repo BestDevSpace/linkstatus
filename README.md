@@ -24,6 +24,33 @@ brew install --cask linkstatus
 
 (Releases publish a **Cask** to the tap; use `--cask` as appropriate for your setup.)
 
+### Homebrew: “Not upgrading … latest version is already installed”
+
+Homebrew only moves forward after it has pulled the **latest tap** from GitHub and compared the cask’s `version` to what you installed.
+
+1. **Update taps first** (easy to forget):
+
+   ```bash
+   brew update
+   brew upgrade --cask linkstatus
+   ```
+
+2. **See what Homebrew thinks** — formula version vs installed:
+
+   ```bash
+   brew info --cask linkstatus
+   ```
+
+   If the formula already shows the new version (e.g. `0.1.2`) and matches **Installed**, then you are on that release; there is nothing to upgrade.
+
+3. **Same version, but you want a clean reinstall** (re-download archive, re-run post-install hooks):
+
+   ```bash
+   brew reinstall --cask linkstatus
+   ```
+
+4. **Note:** The generated cask uses `livecheck` **skip**, so `brew outdated` may **not** list `linkstatus` even when a newer tag exists. After a new GitHub release, run `brew update` and then `brew upgrade --cask linkstatus` (or reinstall).
+
 ### macOS: “could not verify … free of malware” / Gatekeeper
 
 Release binaries are **not** signed with an Apple Developer ID or **notarized**. macOS may block the app until you clear the download quarantine or approve it once.
