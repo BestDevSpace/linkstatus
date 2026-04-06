@@ -1,0 +1,60 @@
+# https://goreleaser.com
+version: 2
+
+project_name: linkstatus
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - id: linkstatus
+    main: .
+    binary: linkstatus
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w
+      - -X=github.com/BestDevSpace/linkstatus/cmd.Version={{.Version}}
+
+archives:
+  - id: default
+    builds:
+      - linkstatus
+    format: tar.gz
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+
+checksum:
+  name_template: "{{ .ProjectName }}_{{ .Version }}_checksums.txt"
+
+snapshot:
+  version_template: "{{ incpatch .Version }}-next"
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^Merge"
+      - "^chore:"
+      - "^ci:"
+
+brews:
+  - name: linkstatus
+    description: "Internet connection monitor — TUI dashboard, background monitor, desktop notifications"
+    homepage: "https://github.com/BestDevSpace/linkstatus"
+    skip_upload: false
+    test: |
+      system "#{bin}/linkstatus", "--help"
+    install: |
+      bin.install "linkstatus"
+    repository:
+      owner: BestDevSpace
+      name: homebrew-tap
+      branch: main
+      token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
