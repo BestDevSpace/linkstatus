@@ -58,6 +58,18 @@ homebrew_casks:
       - linkstatus
     description: "Internet connection monitor — TUI dashboard, background monitor, desktop notifications"
     homepage: "https://github.com/BestDevSpace/linkstatus"
+    # Unsigned GitHub builds are quarantined; strip so Gatekeeper allows running.
+    # Long-term: Developer ID sign + notarize (see README).
+    hooks:
+      post:
+        install: |
+          if OS.mac?
+            system_command "/usr/bin/xattr", args: ["-dr", "com.apple.quarantine", "#{staged_path}/linkstatus"]
+          end
+    caveats: |
+      This binary is not Apple-notarized. If macOS still blocks it, open
+      System Settings → Privacy & Security and choose Open Anyway, or run:
+        xattr -dr com.apple.quarantine "$(command -v linkstatus)"
     skip_upload: false
     repository:
       owner: BestDevSpace

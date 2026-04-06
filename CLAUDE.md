@@ -58,6 +58,7 @@ Defined in `pkg/tui/app.go` (`slashCommands`, `execInput`). Tab completion in `p
 - **Go version:** `go.mod` (1.23).
 - **Releases:** GoReleaser (`.goreleaser.yaml`), GitHub Actions on `v*` tags; **`release.replace_existing_artifacts`** helps re-runs against the same tag.
 - **Homebrew:** `homebrew_casks` → `BestDevSpace/homebrew-tap`; PAT secret **`HOMEBREW_TAP_GITHUB_TOKEN`** must authorize **homebrew-tap** (fine-grained PAT repo list).
+- **macOS Gatekeeper:** release binaries are unsigned; the cask uses **`hooks.post.install`** to run `xattr -dr com.apple.quarantine` on the staged binary ([GoReleaser docs](https://goreleaser.com/customization/publish/homebrew_casks/)). Full fix is Developer ID sign + notarize.
 
 ## Testing
 

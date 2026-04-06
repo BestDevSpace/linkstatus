@@ -24,6 +24,23 @@ brew install --cask linkstatus
 
 (Releases publish a **Cask** to the tap; use `--cask` as appropriate for your setup.)
 
+### macOS: “could not verify … free of malware” / Gatekeeper
+
+Release binaries are **not** signed with an Apple Developer ID or **notarized**. macOS may block the app until you clear the download quarantine or approve it once.
+
+**After a fresh `brew install --cask linkstatus`**, the cask’s post-install step removes quarantine on the staged binary. If you still see a block:
+
+1. **System Settings → Privacy & Security** — scroll to the message about `linkstatus` and choose **Open Anyway** (or run the app once after that).
+2. **Terminal** (removes quarantine on the binary Homebrew linked):
+
+   ```bash
+   xattr -dr com.apple.quarantine "$(command -v linkstatus)"
+   ```
+
+3. **Direct downloads** (tar.gz from GitHub): run the same `xattr` command on the `linkstatus` file **before** moving it, or on the path you run from.
+
+Proper fix for distributors is **code signing + notarization** in CI (Apple Developer Program). The steps above are the usual approach for open-source CLI tools until that exists.
+
 ### Prebuilt binaries
 
 See [GitHub Releases](https://github.com/BestDevSpace/linkstatus/releases) for `linux_amd64`, `linux_arm64`, `darwin_amd64`, and `darwin_arm64` archives and checksums.
