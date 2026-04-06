@@ -1,11 +1,21 @@
 # Publishes GitHub Release binaries (linux/darwin, amd64/arm64) via GoReleaser.
 #
-# Homebrew (optional):
-# 1. Create an empty public repo: github.com/BestDevSpace/homebrew-tap (one-time).
-# 2. In this repo: Settings → Secrets → Actions → add HOMEBREW_TAP_GITHUB_TOKEN
-#    (classic PAT with repo scope, or fine-grained token with contents write on homebrew-tap).
-# 3. If the secret is omitted, releases still run; only the brew tap push is skipped.
-#    After the tap exists: brew tap BestDevSpace/tap && brew install linkstatus
+# Homebrew tap (optional) — secret lives in *this* repo; token must write to *homebrew-tap*:
+# 1. Create github.com/BestDevSpace/homebrew-tap (e.g. empty repo, default branch main).
+# 2. linkstatus → Settings → Secrets and variables → Actions → New repository secret:
+#    HOMEBREW_TAP_GITHUB_TOKEN
+#
+#    Fine-grained PAT (common 403 if misconfigured):
+#    - Resource owner: BestDevSpace (user or org).
+#    - Repository access: MUST include homebrew-tap (not only linkstatus). GoReleaser
+#      calls the Contents API on homebrew-tap; a token limited to linkstatus gets 403.
+#    - Permissions: Contents = Read and write, Metadata = Read.
+#    - If the org uses SSO: authorize the token for the org.
+#
+#    Classic PAT: scope "repo", and the account must have push access to homebrew-tap.
+#
+# 3. Omit the secret to skip tap updates (release still publishes GitHub release assets).
+#    Install: brew tap BestDevSpace/tap && brew install --cask linkstatus
 #
 # Note: secrets.* cannot be used in step `if:` on some runners; we branch via a shell step instead.
 name: Release

@@ -45,6 +45,11 @@ changelog:
       - "^chore:"
       - "^ci:"
 
+# Re-running release for the same tag leaves assets on the GitHub release; without
+# this, uploads fail with 422 already_exists (GitHub-only).
+release:
+  replace_existing_artifacts: true
+
 homebrew_casks:
   - name: linkstatus
     ids:
