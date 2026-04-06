@@ -6,6 +6,8 @@
 #    (classic PAT with repo scope, or fine-grained token with contents write on homebrew-tap).
 # 3. If the secret is omitted, releases still run; only the brew tap push is skipped.
 #    After the tap exists: brew tap BestDevSpace/tap && brew install linkstatus
+#
+# Note: secrets.* cannot be used in step `if:` on some runners; we branch via a shell step instead.
 name: Release
 
 on:
@@ -28,23 +30,23 @@ jobs:
         with:
           go-version-file: go.mod
 
-      - name: GoReleaser (release only, skip Homebrew tap)
-        if: ${{ secrets.HOMEBREW_TAP_GITHUB_TOKEN == '' }}
-        uses: goreleaser/goreleaser-action@v6
-        with:
-          distribution: goreleaser
-          version: "~> v2"
-          args: release --clean --skip=brew
+      - name: Set GoReleaser args (skip brew if no tap token)
+        id: goreleaser_args
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          HOMEBREW_TAP_GITHUB_TOKEN: ${{ secrets.HOMEBREW_TAP_GITHUB_TOKEN }}
+        run: |
+          if [ -n "$HOMEBREW_TAP_GITHUB_TOKEN" ]; then
+            echo "args=release --clean" >> "$GITHUB_OUTPUT"
+          else
+            echo "args=release --clean --skip=brew" >> "$GITHUB_OUTPUT"
+          fi
 
-      - name: GoReleaser (release + push formula to homebrew-tap)
-        if: ${{ secrets.HOMEBREW_TAP_GITHUB_TOKEN != '' }}
+      - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v6
         with:
           distribution: goreleaser
           version: "~> v2"
-          args: release --clean
+          args: ${{ steps.goreleaser_args.outputs.args }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           HOMEBREW_TAP_GITHUB_TOKEN: ${{ secrets.HOMEBREW_TAP_GITHUB_TOKEN }}
