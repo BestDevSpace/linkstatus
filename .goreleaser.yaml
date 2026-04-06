@@ -25,9 +25,10 @@ builds:
 
 archives:
   - id: default
-    builds:
+    ids:
       - linkstatus
-    format: tar.gz
+    formats:
+      - tar.gz
     name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
 
 checksum:
@@ -44,15 +45,15 @@ changelog:
       - "^chore:"
       - "^ci:"
 
-brews:
+homebrew_casks:
   - name: linkstatus
+    ids:
+      - default
+    binaries:
+      - linkstatus
     description: "Internet connection monitor — TUI dashboard, background monitor, desktop notifications"
     homepage: "https://github.com/BestDevSpace/linkstatus"
     skip_upload: false
-    test: |
-      system "#{bin}/linkstatus", "--help"
-    install: |
-      bin.install "linkstatus"
     repository:
       owner: BestDevSpace
       name: homebrew-tap
